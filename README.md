@@ -17,3 +17,6 @@ Once the app is running, it will listen for incoming messages on Telegram and au
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+## Screenshot
+![-215288_temp](https://github.com/dishapatel010/Email-NotifyTG-Worker/assets/71930916/4cb08d6e-9e30-41ff-ae97-50f20f4cbf4d)
