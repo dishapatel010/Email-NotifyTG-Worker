@@ -3,8 +3,6 @@ main = "src/index.js"
 compatibility_date = "2023-05-12"
 [ vars ]
 TOKEN = ""
-CHATID = ""
-FMAILID = ""
 send_email = [
     {type = "send_email", name = "SEB"},
 ]
