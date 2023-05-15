@@ -17,12 +17,18 @@ async function streamToArrayBuffer(stream, streamSize) {
   }
   return result;
 }
+function emailToChatIdMap(emailList) {
+  // Construct an object that maps email addresses to their corresponding chatIds and forward email ids, and toForward status
+  const map = {};
+  emailList.forEach(({ to, chatId, fMailid, toForward }) => {
+    map[to] = { chatId, fMailid, toForward };
+  });
+  return map;
+}
 export default {
   async email(message, env, ctx) {
-    // Define the Telegram API URL and chat ID
+    // Define the Telegram API URL
     const tgToken = env.TOKEN //env VAR
-    const chatId = env.CHATID //env VAR
-    const fMailid = env.FMAILID //env VAR
     const telegramUrl = `https://api.telegram.org/bot${tgToken}/sendMessage`;
     try {
       // Extract the email data
@@ -39,9 +45,12 @@ export default {
       const parsedEmail = await parser.parse(rawEmail);
       // Construct the notification message
       const attachmentCount = parsedEmail.attachments.length;
-      let notificationMessage = `📧 New email received\n\nFrom: ${from}\nTo: ${to}\nSubject: ${subject}\nDate: ${date}\n\n`;
+      let notificationMessage = `📧 New email received\n\nFrom: ${from}\nTo: ${to}\nDate: ${date}\nSubject: ${subject}\n\n`;
       if (parsedEmail.text) {
-        notificationMessage += `Text version: ${parsedEmail.text}\n`;
+        const maxWords = 50; // determine the maximum number of words to display
+        const words = parsedEmail.text.split(" ");
+        const truncatedText = words.slice(0, maxWords).join(" ");
+        notificationMessage += `Text version: ${truncatedText}\n...\n`; // add the truncated text to the message
       }
       if (attachmentCount == 0) {
         notificationMessage += "📎 No attachments";
@@ -49,6 +58,21 @@ export default {
         notificationMessage += "📎 1 attachment";
       } else {
         notificationMessage += `📎 ${attachmentCount} attachments`;
+      }
+      // Define a list of email addresses and their corresponding chatIds and forward email ids
+      const emailList = [
+        { to: "example@gmail.com", chatId: 5071059420, fMailid: "example@example.com", toForward: false }, //only sends notification as its false
+        { to: "example1@example.com", chatId: 5071059420, fMailid: "example3@example.com", toForward: true }, //sends & forward
+        { to: "example2@example.com", chatId: 5071059420, fMailid: "example4@example.com", toForward: false },
+      ];
+
+      // Map the email addresses to their corresponding chatIds and forward email ids
+      const emailToChatId = emailToChatIdMap(emailList);
+      // Find the chatId and fMailid for the current email based on its "to" address
+      const { chatId, fMailid, toForward } = emailToChatId[to] || {};
+      if (!chatId || !fMailid) {
+        console.log(`No matching chatId or fMailid found for email to ${to}`);
+        return;
       }
       // Paste the raw message and html version into Spacebin
       const spacebinUrl = "https://spaceb.in/api/v1/documents/";
@@ -60,6 +84,7 @@ export default {
         text: parsedEmail.text,
         html: parsedEmail.html,
       };
+      
       const mypaste = `${spacebinData.title}\nFrom: ${spacebinData.from}\nTo: ${spacebinData.to}\nDate: ${spacebinData.date}\nText Version:\n${spacebinData.text}\nHtml Version:\n${spacebinData.html}`;
       const spacebinResponse = await fetch(spacebinUrl, {
         method: "POST",
@@ -80,16 +105,19 @@ export default {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          chat_id: chatId,
+          chat_id: chatId, // use the chatId from the emailToChatId mapping
           text: notificationMessage,
           reply_markup: replyMarkup,
+          disable_web_page_preview: "True",
         }),
       });
       // Forward the email to the specified inbox
-      await message.forward(fMailid);
-    } catch (error) {
+      if (toForward) {
+        await message.forward(fMailid);
+        }
+    } catch  (error) {
       console.error(error);
-      // Handle the error here
+      // handle the error here
     }
   },
 };
