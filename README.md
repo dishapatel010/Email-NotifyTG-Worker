@@ -31,4 +31,8 @@ Once the app is running, it will listen for incoming messages on Telegram and au
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 ## Screenshot
+* mails on custom domain at cloudflare
 ![-215288_temp](https://github.com/dishapatel010/Email-NotifyTG-Worker/assets/71930916/4cb08d6e-9e30-41ff-ae97-50f20f4cbf4d)
+
+* mails from gmail.com
+![IMG_20230515_210157_926](https://github.com/dishapatel010/Email-NotifyTG-Worker/assets/71930916/66356e42-7c34-4b9a-b9b3-c8971d5fc7e4)
