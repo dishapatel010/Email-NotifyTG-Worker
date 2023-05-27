@@ -6,3 +6,9 @@ TOKEN = ""
 send_email = [
     {type = "send_email", name = "SEB"},
 ]
+CFURL = "https://example.example.workers.dev/"
+
+[[ d1_databases ]]
+binding = "DB"
+database_name = "emaildb"
+database_id = ""
