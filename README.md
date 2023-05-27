@@ -6,6 +6,8 @@ Email Worker that sends you notifications on Telegram once emails are received.
 1. Fork the repository
 2. Set up the necessary environment variables in `wrangler.toml`:
    * `TOKEN`: Telegram bot token (get it from BotFather)
+   * `database_id`: create D1 database `emaildb` & get it's id here
+   * `CFURL`: `https://example.example.workers.dev/` your cf worker url with / trailing
 3. Edit `src/index.js` email addresses to their corresponding chatIds and forward email ids, and toForward status
 ```javascript
 
@@ -22,6 +24,13 @@ Email Worker that sends you notifications on Telegram once emails are received.
 
 4. Set up the necessary environment variables secrets in `Settings`:
    * `CLOUDFLARE_TOKEN`: Generate from cloudflare account
+5. Go to D1 `emaildb` database console & execute
+```sql
+CREATE TABLE CFWTGW (
+  id INT PRIMARY KEY,
+  html TEXT
+);
+```
 5. Run `Deploy to Cloudflare Workers`action
 
 ## Usage
